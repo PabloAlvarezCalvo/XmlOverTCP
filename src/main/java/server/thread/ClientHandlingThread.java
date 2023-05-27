@@ -6,10 +6,10 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 
-public class SocketHandlingThread extends Thread {
+public class ClientHandlingThread extends Thread {
     private Socket clientSocket;
 
-    public SocketHandlingThread(Socket clientSocket) {
+    public ClientHandlingThread(Socket clientSocket) {
         this.clientSocket = clientSocket;
 
         InetAddress clientAddress = clientSocket.getInetAddress();
@@ -18,7 +18,7 @@ public class SocketHandlingThread extends Thread {
         System.out.println("Connected to port: " + clientSocket.getLocalPort() + ".\n");
     }
 
-    public SocketHandlingThread(String name, Socket clientSocket) {
+    public ClientHandlingThread(String name, Socket clientSocket) {
         super(name);
 
         this.clientSocket = clientSocket;
@@ -33,18 +33,8 @@ public class SocketHandlingThread extends Thread {
         try (
                 DataInputStream dis = new DataInputStream(clientSocket.getInputStream())
         ){
-            String line;
-            do {
-                line = dis.readUTF();
-
-                if (!line.equals("*")){
-                    System.out.println("Recibido: " + line);
-                    DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
-
-                    System.out.println("Enviado: " + line.toUpperCase());
-                    dos.writeUTF(line.toUpperCase());
-                }
-            } while (!line.equals("*"));
+            System.out.println("Received from client:");
+            System.out.println(dis.readUTF());
 
         } catch (IOException e) {
             e.printStackTrace();
