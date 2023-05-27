@@ -8,10 +8,7 @@ import org.w3c.dom.Element;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.DataInputStream;
@@ -26,8 +23,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class XMLtoTCP {
-    private final static String XML_DECLARATION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-    private final static String XML_BODY = "<Msg Name=\"OpenStudies\" Type=\"XA\"><Param Name=\"ProcessId\">Identificador</Param></Msg>";
+
+    //<Msg Name="OpenStudies" Type="XA"><Param Name="ProcessId">Identificador</Param></Msg>";
     private final static String ROOT_TAG = "Msg";
     private final static String PARAM_TAG = "Param";
     private final static String ROOT_NAME_VALUE = "OpenStudies";
@@ -140,12 +137,12 @@ public class XMLtoTCP {
 
                 DOMImplementation implementation = builder.getDOMImplementation();
                 Document document = implementation.createDocument(null, null, null);
-
+                document.setXmlStandalone(true);
 
                 // root element
                 Element rootElement = document.createElement(ROOT_TAG);
                 document.appendChild(rootElement);
-                // setting attribute to element
+                // setting attribute to the root element
                 Attr attrName = document.createAttribute(NAME_ATT_TAG);
                 attrName.setValue(ROOT_NAME_VALUE);
                 rootElement.setAttributeNode(attrName);
@@ -163,6 +160,9 @@ public class XMLtoTCP {
 
                 TransformerFactory tfFactory = TransformerFactory.newInstance();
                 Transformer transformer = tfFactory.newTransformer();
+                transformer.setOutputProperty(OutputKeys.VERSION, "1.0");
+                transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+
 
                 StringWriter writer = new StringWriter();
                 transformer.transform(new DOMSource(document), new StreamResult(writer));
