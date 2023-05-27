@@ -16,15 +16,14 @@ public class XMLtoTCP {
     private final static Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args) {
+        tcpConnection();
+    }
 
+    private static void tcpConnection() {
         InetAddress serverAddress = inputIP();
         int serverPort = inputPort();
         String xmlString = inputPID();
 
-        tcpConnection(serverAddress, serverPort, xmlString);
-    }
-
-    private static void tcpConnection(InetAddress serverAddress, int serverPort, String xmlString) {
         try(
                 Socket clientSocket = new Socket(serverAddress, serverPort);
                 DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
@@ -35,8 +34,10 @@ public class XMLtoTCP {
 
             dos.writeUTF(xmlString);
 
+
             System.out.println("Server response:");
             System.out.println(dis.readUTF());
+            clientSocket.shutdownOutput();
 
 
         } catch (IOException e) {
