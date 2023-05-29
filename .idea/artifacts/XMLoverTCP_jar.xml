@@ -1,8 +1,8 @@
 <component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="XmlOverTCP:jar">
+  <artifact type="jar" name="XMLoverTCP:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/XMLoverTCP_jar</output-path>
-    <root id="archive" name="XmlOverTCP.jar">
-      <element id="module-output" name="XmlOverTCP" />
+    <root id="archive" name="XMLoverTCP.jar">
+      <element id="module-output" name="XMLoverTCP" />
     </root>
   </artifact>
 </component>
