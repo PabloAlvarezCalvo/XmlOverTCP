@@ -35,16 +35,16 @@ public class XMLtoTCP {
     private final static Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args) {
-        establishTcpConnection();
+        establishTcpConnection(sc);
     }
 
-    private static void establishTcpConnection() {
+    public static void establishTcpConnection(Scanner sc) {
         InetAddress serverAddress;
         try {
-            serverAddress = inputIP();
+            serverAddress = inputIP(sc);
 
-            int serverPort = inputPort();
-            String processIdentifier = inputProcessIdentifier();
+            int serverPort = inputPort(sc);
+            String processIdentifier = inputProcessIdentifier(sc);
             String xmlString = createXML(processIdentifier);
 
             try(
@@ -70,7 +70,7 @@ public class XMLtoTCP {
         }
     }
 
-    private static InetAddress inputIP() throws UnknownHostException {
+    private static InetAddress inputIP(Scanner sc) throws UnknownHostException {
         InetAddress ipAddress = null;
         boolean validIp;
 
@@ -97,7 +97,7 @@ public class XMLtoTCP {
         return ipAddress;
     }
 
-    private static int inputPort() {
+    private static int inputPort(Scanner sc) {
         int port = -1;
         boolean validPort = false;
 
@@ -121,7 +121,7 @@ public class XMLtoTCP {
         return port;
     }
 
-    private static String inputProcessIdentifier(){
+    private static String inputProcessIdentifier(Scanner sc){
         System.out.println("Specify the process ID:");
         String pid;
         do {
@@ -132,7 +132,7 @@ public class XMLtoTCP {
         return pid;
     }
 
-    private static String createXML(String pid){
+    private static String createXML(String processIdentifier){
         try {
             String output;
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -160,7 +160,7 @@ public class XMLtoTCP {
                 Attr paramAttrName = document.createAttribute(NAME_ATT_TAG);
                 paramAttrName.setValue(PARAM_NAME_VALUE);
                 param.setAttributeNode(paramAttrName);
-                param.setTextContent(pid);
+                param.setTextContent(processIdentifier);
 
                 rootElement.appendChild(param);
 
