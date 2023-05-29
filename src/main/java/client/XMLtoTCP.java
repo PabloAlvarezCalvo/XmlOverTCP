@@ -35,37 +35,42 @@ public class XMLtoTCP {
     private final static Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args) {
-        tcpConnection();
+        establishTcpConnection();
     }
 
-    private static void tcpConnection() {
-        InetAddress serverAddress = inputIP();
-        int serverPort = inputPort();
-        String pid = inputPID();
-        String xmlString = createXML(pid);
+    private static void establishTcpConnection() {
+        InetAddress serverAddress;
+        try {
+            serverAddress = inputIP();
 
-        try(
-                Socket clientSocket = new Socket(serverAddress, serverPort);
-                DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
-                DataInputStream dis = new DataInputStream(clientSocket.getInputStream())
-        ){
-            System.out.println("Sending:");
-            System.out.println(xmlString + "\n");
+            int serverPort = inputPort();
+            String processIdentifier = inputProcessIdentifier();
+            String xmlString = createXML(processIdentifier);
 
-            dos.writeUTF(xmlString);
+            try(
+                    Socket clientSocket = new Socket(serverAddress, serverPort);
+                    DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
+                    DataInputStream dis = new DataInputStream(clientSocket.getInputStream())
+            ){
+                System.out.println("Sending:");
+                System.out.println(xmlString + "\n");
 
+                dos.writeUTF(xmlString);
 
-            System.out.println("Server response:");
-            System.out.println(dis.readUTF());
-            clientSocket.shutdownOutput();
+                System.out.println("Server response:");
+                System.out.println(dis.readUTF());
+                clientSocket.shutdownOutput();
 
+            } catch (IOException e) {
+                System.err.println(e.getMessage());
+            }
 
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private static InetAddress inputIP() {
+    private static InetAddress inputIP() throws UnknownHostException {
         InetAddress ipAddress = null;
         boolean validIp;
 
@@ -86,6 +91,7 @@ public class XMLtoTCP {
             ipAddress = InetAddress.getByName(ipString);
         } catch (UnknownHostException e) {
             System.err.println(e.getMessage());
+            throw new UnknownHostException(e.getMessage());
         }
 
         return ipAddress;
@@ -115,7 +121,7 @@ public class XMLtoTCP {
         return port;
     }
 
-    private static String inputPID(){
+    private static String inputProcessIdentifier(){
         System.out.println("Specify the process ID:");
         String pid;
         do {
@@ -128,7 +134,7 @@ public class XMLtoTCP {
 
     private static String createXML(String pid){
         try {
-            String output = "";
+            String output;
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder;
 
