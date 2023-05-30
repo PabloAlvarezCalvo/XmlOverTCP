@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.example</groupId>
+    <groupId>dev.pabloac</groupId>
     <artifactId>XMLoverTCP</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -32,14 +32,14 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.example</groupId>
+                <groupId>dev.pabloac</groupId>
                 <artifactId>XMLoverTCP</artifactId>
                 <version>1.0-SNAPSHOT</version>
-
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>client.XMLtoTCP</mainClass>
+                            <addClassPath>true</addClassPath>
+                            <mainClass>dev.pabloac.client.XMLtoTCP</mainClass>
                             <layout>JAR</layout>
                         </manifest>
                     </archive>

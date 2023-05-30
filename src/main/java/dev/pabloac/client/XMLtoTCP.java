@@ -1,5 +1,6 @@
-package client;
+package dev.pabloac.client;
 
+import dev.pabloac.utils.IpAddressValidator;
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
@@ -19,26 +20,23 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class XMLtoTCP {
 
-    //<Msg Name="OpenStudies" Type="XA"><Param Name="ProcessId">Identificador</Param></Msg>";
-    private final static String ROOT_TAG = "Msg";
-    private final static String PARAM_TAG = "Param";
-    private final static String ROOT_NAME_VALUE = "OpenStudies";
-    private final static String PARAM_NAME_VALUE = "ProcessId";
-    private final static String NAME_ATT_TAG = "Name";
-    private final static String TYPE_ATT_TAG = "Type";
-    private final static String TYPE_ATT_VALUE = "XA";
     private final static Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args) {
         establishTcpConnection(sc);
     }
 
-    public static void establishTcpConnection(Scanner sc) {
+    /**
+     * Prompts the user for an IP address, a port and a process identifier
+     * Tries to connect to received IP and port and send an XML object
+     * in String form with the specified process identifier
+     *
+     * @param sc a Scanner object
+     */
+    protected static void establishTcpConnection(Scanner sc) {
         InetAddress serverAddress;
         try {
             serverAddress = inputIP(sc);
@@ -70,19 +68,23 @@ public class XMLtoTCP {
         }
     }
 
-    private static InetAddress inputIP(Scanner sc) throws UnknownHostException {
-        InetAddress ipAddress = null;
+    /**
+     * Requests the user to write an IP address until a valid IPV4 one is received,
+     * then returns an InetAddress object of said address
+     * @param sc a Scanner object
+     * @return an InetAddress object
+     * @throws UnknownHostException
+     */
+    protected static InetAddress inputIP(Scanner sc) throws UnknownHostException {
+        InetAddress ipAddress;
         boolean validIp;
 
-        Pattern ipPattern = Pattern.compile("^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$");
-
-        System.out.println("Specify the IP to connecto to:");
+        System.out.println("Specify the IP (v4) to connecto to:");
 
         String ipString;
         do {
             ipString = sc.nextLine();
-            Matcher matcher = ipPattern.matcher(ipString);
-            validIp = matcher.matches();
+            validIp = IpAddressValidator.isValidIPV4Address(ipString);
             if (!validIp) System.out.println("Incorrect IP address, please try again:");
         } while (!validIp);
 
@@ -97,7 +99,15 @@ public class XMLtoTCP {
         return ipAddress;
     }
 
-    private static int inputPort(Scanner sc) {
+    /**
+     * Requests a TCP port to the user until receiving one
+     * in the specified range (1 - 49150)
+     * @param sc a Scanner object
+     * @return a port number in int form
+     */
+    protected static int inputPort(Scanner sc) {
+        final int MIN_PORT = 0;
+        final int MAX_PORT = 49151;
         int port = -1;
         boolean validPort = false;
 
@@ -107,7 +117,7 @@ public class XMLtoTCP {
             try {
                 port = Integer.parseInt(sc.nextLine());
 
-                if (port > 0 && port < 49151) {
+                if (port > MIN_PORT && port < MAX_PORT) {
                     validPort = true;
                 }
             } catch (Exception e) {
@@ -121,18 +131,37 @@ public class XMLtoTCP {
         return port;
     }
 
-    private static String inputProcessIdentifier(Scanner sc){
-        System.out.println("Specify the process ID:");
-        String pid;
+    /**
+     * Asks the user to input a Procress Indentifier until a non-empty string
+     * @param sc a Scanner object
+     * @return a String
+     */
+    protected static String inputProcessIdentifier(Scanner sc){
+        System.out.println("Specify the process identifier:");
+        String processIdentifier;
         do {
-            pid = sc.nextLine();
-            if(pid.length() < 1 ) System.out.println("The process ID can't be blank, please try again:");
-        } while (pid.length() < 1);
+            processIdentifier = sc.nextLine();
+            if(processIdentifier.isBlank()) System.out.println("The process ID can't be blank, please try again:");
+        } while (processIdentifier.length() < 1);
 
-        return pid;
+        return processIdentifier;
     }
 
-    private static String createXML(String processIdentifier){
+    /**
+     * Programatically creates an XML string with the specified structure
+     * @param processIdentifier the value to be inserted in the <Param> node
+     * @return a XML string
+     */
+    protected static String createXML(String processIdentifier){
+        //<?xml version="1.0" encoding="UTF-8"?><Msg Name="OpenStudies" Type="XA"><Param Name="ProcessId">Identificador</Param></Msg>";
+        final String ROOT_TAG = "Msg";
+        final String PARAM_TAG = "Param";
+        final String ROOT_NAME_VALUE = "OpenStudies";
+        final String PARAM_NAME_VALUE = "ProcessId";
+        final String NAME_ATT_TAG = "Name";
+        final String TYPE_ATT_TAG = "Type";
+        final String TYPE_ATT_VALUE = "XA";
+
         try {
             String output;
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
